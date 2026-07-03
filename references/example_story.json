@@ -1,0 +1,140 @@
+{
+  "title": "The Legendary Golden Smoothie",
+  "aspect": "16:9",
+  "no_music": true,
+  "words_per_sec": 2.5,
+  "style": "glossy vibrant 3D animated feature-film look, Pixar-meets-neon, physically based rendering, cinematic color grading with rich teal-and-magenta neon, volumetric haze and light, crisp micro-detail, playful AI-slop internet-cartoon energy",
+  "characters": {
+    "benny": {
+      "name": "Benny",
+      "voice": "an upbeat, cocky, energetic young male voice",
+      "short": "full human body with a yellow banana head, yellow bomber jacket and jeans",
+      "desc": "Benny, a humanoid-fruit character: a full realistic human male body with an average athletic build wearing a bright yellow bomber jacket, a white t-shirt, blue jeans and red high-top sneakers, BUT instead of a human head he has a large smooth yellow BANANA for a head (a big banana curved upward, with two big friendly cartoon eyes and a wide confident grin on the front). Cocky, energetic posture"
+    },
+    "straw": {
+      "name": "Straw",
+      "voice": "a dry, deadpan, skeptical young female voice",
+      "short": "full human body with a red strawberry head, denim jacket and green skirt",
+      "desc": "Straw, a humanoid-fruit character: a full realistic human female body, slim, wearing a denim jacket, a green skirt and white sneakers, BUT instead of a human head she has a big round red STRAWBERRY for a head (dotted with tiny yellow seeds, a small green leafy crown on top, two big expressive eyes and a small mouth). Deadpan, skeptical posture"
+    },
+    "coco": {
+      "name": "Coco",
+      "voice": "a deep, gruff, gravelly older male voice",
+      "short": "burly full human body with a brown coconut head and a white bartender apron",
+      "desc": "Coco, a humanoid-fruit character: a full realistic burly muscular human male body with broad shoulders and forearms, wearing a white bartender apron over a grey rolled-sleeve t-shirt, BUT instead of a human head he has a big rough brown hairy COCONUT for a head (with two eyes and a gruff mouth on the front). Gruff bartender"
+    }
+  },
+  "objects": {
+    "smoothie": {
+      "desc": "THE LEGENDARY GOLDEN SMOOTHIE: a tall clear glass cup filled with a luminous glowing liquid-gold smoothie that emits soft golden sparkles and light, topped with a curly gold straw and a tiny glowing fruit garnish"
+    }
+  },
+  "locations": {
+    "street": {
+      "base": "FRUIT CITY street at night: a neon-lit street where the skyscrapers are giant stylized fruits, glowing pink-and-cyan neon signs shaped like oranges, grapes and pineapples, neon signs reading 'JUICY NEON MARKET' and 'MELON ARCADE', wet reflective pavement and little market stalls",
+      "views": {
+        "wide": "a wide cinematic establishing shot looking straight down the middle of the street, deep perspective",
+        "cu": "a low-angle medium shot from street level looking up, the towering neon fruit signs glowing and streaking behind, wet asphalt reflections in the foreground"
+      }
+    },
+    "juicebar": {
+      "base": "interior of 'THE SQUEEZE', a cozy neon juice bar: a polished wooden bar counter, a back wall of glowing bottles of colorful juice, hanging Edison bulbs, a chrome blender on the counter, a big pink neon sign reading 'THE SQUEEZE', a chalkboard menu and a few bar stools",
+      "views": {
+        "front": "seen from the customer side: a medium-wide shot facing the bar counter, the glowing bottle wall and the neon 'THE SQUEEZE' sign",
+        "behind": "the REVERSE angle from BEHIND the bar on the bartender's side, looking out across the counter toward the stools and the entrance",
+        "counter": "a tight low macro-friendly angle down on the polished counter surface and a couple of stools, warm neon rim light and shallow depth of field",
+        "corner": "a wide shot from a far corner of the room showing more of the interior, side tables, the hanging bulbs and the bar off to one side"
+      }
+    },
+    "rooftop": {
+      "base": "a rooftop terrace at night overlooking the glowing Fruit City skyline of giant neon fruit skyscrapers, string lights overhead, a low railing, potted plants and a deep blue starry sky",
+      "views": {
+        "wide": "a wide cinematic hero shot with the neon fruit skyline filling the background and the terrace floor in the foreground"
+      }
+    }
+  },
+  "shots": [
+    {
+      "id": "1_street", "chars": ["benny", "straw"], "object": null, "location": "street__wide",
+      "camera": "wide establishing two-shot; a slow cinematic crane-down easing into a gentle push-in along the wet neon street; anamorphic 35mm look with deep neon bokeh and a faint handheld sway",
+      "atmosphere": "rain-slicked pavement mirroring pink and cyan neon, drifting steam from a street vent, cool night key light with warm neon rim",
+      "ambient": "night city crowd murmur, distant traffic, a faint neon buzz and dripping water",
+      "keyframe": "Benny throws both arms up in excitement mid-street while Straw stands beside him arms folded, unimpressed, both full-body and small in a grand neon cityscape",
+      "action": "Benny sweeps his arms wide toward the glowing skyline in a big hype gesture; Straw slowly rolls her eyes",
+      "dialogue": [
+        {"who": "benny", "line": "Straw, today we find the legendary golden smoothie!"},
+        {"who": "straw", "line": "Benny, that is literally just a myth."}
+      ]
+    },
+    {
+      "id": "2_walk", "chars": ["benny"], "object": null, "location": "street__cu",
+      "camera": "low-angle dolly-in tightening to a determined close-up of Benny's banana face as he strides toward camera; 50mm, shallow focus, neon signs streaking softly out of focus behind him",
+      "atmosphere": "hard magenta rim light raking across Benny, reflective wet asphalt flaring below, shallow depth isolating him",
+      "ambient": "confident footsteps splashing on wet pavement, low city hum",
+      "keyframe": "a low-angle close-up of Benny mid-stride, jaw set with determination, towering neon fruit signs blazing behind him",
+      "action": "Benny strides forward with growing determination and points ahead as the camera pushes in on his face",
+      "dialogue": [
+        {"who": "benny", "line": "I can feel it, Straw. Today is the day."}
+      ]
+    },
+    {
+      "id": "3_enter", "chars": ["benny", "straw"], "object": null, "location": "juicebar__front",
+      "camera": "smooth Steadicam track following the pair up to the bar counter, settling into a medium-wide two-shot; warm Edison-bulb key with cool neon fill, shallow depth",
+      "atmosphere": "cozy amber bulbs versus the cold glow of the juice-bottle wall, soft bloom on the 'THE SQUEEZE' neon",
+      "ambient": "quiet bar-room tone, the clink of glasses, a low fridge hum",
+      "keyframe": "Benny leans confidently on the wooden bar counter pointing forward while Straw stands just behind him looking unimpressed",
+      "action": "Benny slaps the counter and leans in eagerly; Straw sighs and folds her arms behind him",
+      "dialogue": [
+        {"who": "benny", "line": "One legendary golden smoothie, please!"},
+        {"who": "straw", "line": "He's serious. He's actually serious."}
+      ]
+    },
+    {
+      "id": "4_reveal", "chars": ["coco", "benny"], "object": "smoothie", "location": "juicebar__behind",
+      "camera": "reverse over-the-shoulder from behind the bar, a slow push toward the glowing smoothie with a rack focus pulling from Coco's face to the drink; 40mm, golden glow blooming into the lens",
+      "atmosphere": "the golden smoothie is the brightest thing in frame, throwing warm light up onto Coco's coconut face against the cool neon",
+      "ambient": "a low bar-room hum, the soft clink of the glass on the counter, and a gentle magical shimmer sound effect as the smoothie glows",
+      "keyframe": "from behind the bar, Coco sets the glowing Legendary Golden Smoothie on the counter, its light on his face, as Benny watches from the customer side across the counter",
+      "action": "Coco slides the glowing golden smoothie forward across the counter and cocks a skeptical eyebrow at Benny",
+      "dialogue": [
+        {"who": "coco", "line": "You sure you can handle it, kid?"},
+        {"who": "benny", "line": "I was born ready, Coco."}
+      ]
+    },
+    {
+      "id": "5_sip", "chars": ["benny"], "object": "smoothie", "location": "juicebar__counter",
+      "camera": "open on a macro insert of the curly gold straw and glowing liquid, then tilt up into a close-up of Benny's astonished banana face; 85mm, buttery bokeh, tiny golden sparkles drifting",
+      "atmosphere": "intimate warm golden pool of light on the counter, everything else falling into soft neon darkness",
+      "ambient": "one loud comedic slurp through the straw and a short sparkly magical shimmer sound effect as it hits, otherwise a quiet room",
+      "keyframe": "a tight low angle on the counter: Benny lifts the glowing golden smoothie to his banana-face with both hands, eyes wide with anticipation, golden light reflecting on him",
+      "action": "Benny takes one big dramatic sip through the gold straw and his eyes go huge with amazement",
+      "dialogue": [
+        {"who": "benny", "line": "Whoa... this is absolutely incredible!"}
+      ]
+    },
+    {
+      "id": "6_power", "chars": ["benny", "straw"], "object": null, "location": "juicebar__corner",
+      "camera": "low-angle slow tilt-up combined with a gentle orbit as Benny lifts off the floor haloed in golden light; widens from medium to wide, volumetric god-rays, Straw small in the foreground looking up",
+      "atmosphere": "golden light and floating sparks fill the room, long dramatic shadows, the neon bar cool behind the warm glow",
+      "ambient": "soft airy whooshes and light popping sparkle sound effects (discrete foley, not musical)",
+      "keyframe": "in the corner of the bar, Benny floats a little off the floor glowing with golden light and sparkles, arms spread triumphantly, while Straw stares up at him astonished",
+      "action": "Benny hovers in the air wreathed in golden sparkles, arms spread; Straw gasps and points up at him",
+      "dialogue": [
+        {"who": "straw", "line": "Benny, you're glowing!"},
+        {"who": "benny", "line": "I have never felt more alive!"}
+      ]
+    },
+    {
+      "id": "7_toast", "chars": ["benny", "straw", "coco"], "object": "smoothie", "location": "rooftop__wide",
+      "camera": "a rising crane that booms up and back into a wide hero shot over the neon skyline as the three clink glasses; 28mm, string-light bokeh, a brief slow-motion feel on the clink",
+      "atmosphere": "warm string lights over cool city neon, gentle night haze, the golden smoothies glowing like little lanterns",
+      "ambient": "a gentle night breeze, distant city hum and a bright glass clink",
+      "keyframe": "on the rooftop terrace over the glowing Fruit City skyline, Benny, Straw and Coco stand together each holding a glowing golden smoothie, raising them for a toast, all three full-body",
+      "action": "the three friends raise and clink their glowing golden smoothies together in a happy toast over the neon skyline",
+      "dialogue": [
+        {"who": "benny", "line": "To the legendary golden smoothie!"},
+        {"who": "straw", "line": "To Fruit City!"}
+      ]
+    }
+  ]
+}

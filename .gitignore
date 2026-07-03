@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Generated media / build outputs
+*_out/
+media/
+*.mp4
+*.png
+*.jpg
+*.jpeg
+*.webp
+# keep example/reference assets if any are added under references/
+!references/**
+
+# OS
+.DS_Store
