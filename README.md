@@ -72,6 +72,15 @@ Stages are resumable: `refs` → `keyframes` → `clips` → `stitch` (or `all`)
 `smoothie_out/refs/` and `.../keyframes/` before generating clips if you like. Per-clip
 loop transcripts/verdicts are saved in `smoothie_out/critiques/*.json`.
 
+Before generating anything, you can **pre-flight the length** (deterministic, no API
+calls, no output files):
+```bash
+python scripts/build.py references/example_story.json plan
+```
+It validates the spec and prints each shot's floor + planned seconds, the feasible
+total window, and — if `target_seconds` is set — whether the plan hits it `[EXACT]`.
+An invalid or unreachable spec prints `SPEC INVALID` and exits non-zero.
+
 ### Make your own film
 Copy `references/example_story.json`, edit it, and run `build.py` on it. A story spec
 looks like:
@@ -80,6 +89,7 @@ looks like:
   "title": "My Film",
   "aspect": "16:9",              // or "9:16"
   "no_music": true,              // no background-music soundtrack (SFX allowed)
+  "target_seconds": 60,          // optional; if set, the film is made EXACTLY this long
   "style": "global look, appended to every prompt",
   "characters": { "hero": { "name": "...", "voice": "...", "short": "...", "desc": "..." } },
   "objects":    { "prop": { "desc": "..." } },
@@ -96,6 +106,19 @@ looks like:
 See [`references/prompting_guide.md`](skills/consistent-genmedia/references/prompting_guide.md)
 for how to write consistent, cinematic prompts, and
 [`SKILL.md`](skills/consistent-genmedia/SKILL.md) for the full agent workflow.
+
+### Exact total length (optional)
+Set `target_seconds` and the film is made that length **deterministically**. Each shot
+first gets a floor = the seconds its dialogue needs (clamped to the 3–10s per-clip
+range); the remaining seconds are distributed so the plan sums to `target_seconds`
+exactly, the feedback loop is capped so no clip grows past its plan, and stitch conforms
+each clip (pad-hold short ones / trim long ones) to lock the final file on target.
+
+The request must fall inside `[Σ floors, 10 × num_shots]` — i.e. you need enough shots
+(each clip caps at 10s) and your dialogue must fit. Outside that window the build stops
+with `SPEC INVALID` and the exact feasible range, so you never get a wrong-length video.
+Run the `plan` stage to check before generating. Leave `target_seconds` unset for the
+original free-running length (the sum of per-shot dialogue estimates).
 
 ## Tuning (env)
 - `REF_CONCURRENCY`, `KEY_CONCURRENCY`, `CLIP_CONCURRENCY` (default 6) — parallelism

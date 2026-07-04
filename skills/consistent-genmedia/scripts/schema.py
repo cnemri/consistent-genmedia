@@ -11,6 +11,7 @@ SPEC = {
   "style": str,                            # global look, appended everywhere
   "words_per_sec": 2.5,                    # optional (default 2.5 == 150 wpm)
   "no_music": true,                        # optional (default true == no background music)
+  "target_seconds": 60,                    # optional; if set, the duration plan sums to it EXACTLY
   "characters": { key: {"name","desc","short","voice"} },
   "objects":    { key: {"desc"} },         # optional hero props
   "locations":  { key: {"base", "views": { view: desc, ... }} },  # first view = master
@@ -27,6 +28,11 @@ SPEC = {
 
 Location view keys are "<location>__<view>", e.g. "juicebar__front".
 """
+
+import math
+
+CLIP_MIN_SECONDS = 3
+CLIP_MAX_SECONDS = 10
 
 
 def _cfg(spec, key, default):
@@ -107,9 +113,37 @@ def dialogue_for_critic(spec, shot):
             for d in shot["dialogue"]]
 
 
-def plan_duration(spec, shot):
-    """Plan clip length from dialogue at words_per_sec + lead-in/pauses/reaction,
-    clamped to omni's 3-10s. Silent shots get a sensible default."""
+def target_seconds(spec):
+    """Requested total film length in seconds, or None if length is unconstrained."""
+    t = spec.get("target_seconds")
+    return float(t) if t is not None else None
+
+
+def _speech_seconds(spec, shot):
+    """Seconds the shot's dialogue needs (lead-in + speech + inter-line gaps +
+    reaction beat), BEFORE any 3-10s clamp. 0.0 for a silent shot."""
+    dl = shot.get("dialogue", [])
+    n = len(dl)
+    if n == 0:
+        return 0.0
+    words = sum(len(d["line"].split()) for d in dl)
+    gaps = max(0, n - 1) * 0.7
+    return words / words_per_sec(spec) + gaps + 1.2 + 1.3
+
+
+def shot_floor(spec, shot):
+    """Smallest whole-second clip length that still fits this shot's dialogue (plus
+    any action `pad`), clamped to omni's 3-10s. The planner never goes below this,
+    so hitting a requested total can never rush or cut off a line."""
+    need = _speech_seconds(spec, shot) + float(shot.get("pad", 0.0))
+    if need <= 0:  # silent shot
+        return max(CLIP_MIN_SECONDS, min(CLIP_MAX_SECONDS, round(4 + float(shot.get("pad", 0.0)))))
+    return max(CLIP_MIN_SECONDS, min(CLIP_MAX_SECONDS, math.ceil(need)))
+
+
+def _legacy_plan_duration(spec, shot):
+    """Per-shot length when NO total-length target is set (original behaviour):
+    round the dialogue estimate and clamp to 3-10s; total = whatever that sums to."""
     wps = words_per_sec(spec)
     words = sum(len(d["line"].split()) for d in shot.get("dialogue", []))
     n = len(shot.get("dialogue", []))
@@ -119,6 +153,52 @@ def plan_duration(spec, shot):
     gaps = max(0, n - 1) * 0.7
     total = speech + gaps + 1.2 + 1.3 + shot.get("pad", 0.0)
     return max(3, min(10, round(total)))
+
+
+def plan_durations(spec):
+    """DETERMINISTIC per-shot duration plan as {shot_id: whole_seconds}.
+
+    * No `target_seconds`  -> legacy per-shot planning; the film length is just the
+      sum (free-running, as before).
+    * `target_seconds` set -> the plan is guaranteed to sum to the request EXACTLY:
+        floors  = shot_floor() for every shot (each already fits its own dialogue)
+        window  = [sum(floors), CLIP_MAX_SECONDS * num_shots]
+      The target must fall inside that window, else ValueError names the exact
+      numbers and how to fix it. Otherwise the surplus (target - sum(floors)) is
+      handed out one second at a time, in shot order, to shots still under the
+      per-clip cap. Integers in, integers out -> the sum is exactly the target."""
+    shots = spec.get("shots", [])
+    tgt = target_seconds(spec)
+    if tgt is None:
+        return {s["id"]: _legacy_plan_duration(spec, s) for s in shots}
+
+    n = len(shots)
+    if n == 0:
+        raise ValueError("target_seconds is set but the spec has no shots")
+    tgt = int(round(tgt))
+    floors = [shot_floor(spec, s) for s in shots]
+    lo, hi = sum(floors), CLIP_MAX_SECONDS * n
+    if tgt < lo or tgt > hi:
+        raise ValueError(
+            f"target_seconds={tgt}s is unreachable with {n} shot(s): the feasible "
+            f"range is {lo}-{hi}s (each clip is {CLIP_MIN_SECONDS}-{CLIP_MAX_SECONDS}s; "
+            f"dialogue sets the per-shot floors {floors}). "
+            f"To go shorter: cut dialogue words or remove a shot. "
+            f"To go longer: add a shot or lengthen dialogue.")
+    durs = list(floors)
+    slack = tgt - lo
+    i = 0
+    while slack > 0:  # guaranteed to terminate: total headroom (hi-lo) >= slack
+        if durs[i] < CLIP_MAX_SECONDS:
+            durs[i] += 1
+            slack -= 1
+        i = (i + 1) % n
+    return {s["id"]: d for s, d in zip(shots, durs)}
+
+
+def plan_duration(spec, shot):
+    """One shot's planned whole-second duration (honours target_seconds)."""
+    return plan_durations(spec)[shot["id"]]
 
 
 def duration_str(spec, shot):
@@ -217,6 +297,11 @@ def validate(spec):
             lk, vk = loc.split("__", 1)
             if lk not in spec.get("locations", {}) or vk not in spec["locations"][lk]["views"]:
                 errs.append(f"shot {s.get('id')}: unknown location view '{loc}'")
+    t = spec.get("target_seconds")
+    if t is not None and (isinstance(t, bool) or not isinstance(t, (int, float)) or t <= 0):
+        errs.append(f"target_seconds must be a positive number, got {t!r}")
     if errs:
         raise ValueError("Invalid story spec:\n  - " + "\n  - ".join(errs))
+    if spec.get("target_seconds") is not None:
+        plan_durations(spec)  # deterministic; raises ValueError if the target is unreachable
     return True

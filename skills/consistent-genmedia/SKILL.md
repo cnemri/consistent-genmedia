@@ -77,7 +77,27 @@ model ids and API details current, since those can change.
    - Give each location the angle views its shots need (e.g. `bar__front`,
      `bar__behind`, `bar__counter`).
    - Write rich `camera` (shot size + angle + lens + movement) — see the guide.
-2. **Validate & run** the builder:
+   - **Exact total length (optional):** set `target_seconds` and the pipeline
+     makes the film that length *deterministically*. Each shot first gets a
+     floor = the seconds its dialogue needs (clamped to 3–10s); the remaining
+     seconds are distributed so the plan sums to `target_seconds` exactly, the
+     feedback loop is capped so no clip grows past its plan, and stitch conforms
+     each clip (pad-hold / trim) to lock the final file on target. The request
+     must fall in `[Σ floors, 10 × num_shots]`; outside that, `validate()` fails
+     with the exact feasible range and how to fix it (cut/add dialogue or shots).
+     Leave `target_seconds` unset for the original free-running length (= the sum
+     of per-shot dialogue estimates).
+2. **Pre-flight the length (no API cost)** — validate the spec and see the
+   deterministic duration plan + feasible window before generating anything:
+   ```bash
+   python scripts/build.py my_story.json plan
+   ```
+   It prints each shot's floor (dialogue-safe minimum) and planned seconds, the
+   feasible total `[Σ floors, 10 × num_shots]`, and — if `target_seconds` is set —
+   whether the plan hits it `[EXACT]`. An unreachable target (or any invalid
+   spec) prints `SPEC INVALID` with the fix and exits non-zero. Use this to pick a
+   feasible `target_seconds`.
+3. **Run** the builder:
    ```bash
    python scripts/build.py my_story.json all --out my_story_out
    ```
@@ -89,7 +109,7 @@ model ids and API details current, since those can change.
    > whose bytes don't match its declared media type is rejected with a hard 400.
    > If you ever attach media you did NOT generate here, sniff the bytes for the
    > mime type instead of trusting the filename extension.
-3. **Review** `my_story_out/final/<title>.mp4`. Per-clip loop transcripts and
+4. **Review** `my_story_out/final/<title>.mp4`. Per-clip loop transcripts and
    verdicts are saved in `my_story_out/critiques/*.json`.
 
 ### Example (bundled)
