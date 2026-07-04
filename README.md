@@ -53,6 +53,8 @@ directly from `skills/consistent-genmedia/`.
 ## Prerequisites
 - `pip install -U google-genai` (>= 2.10)
 - `ffmpeg` and `ffprobe` on your `PATH`
+- Optional: `pip install pillow` — transcodes generated images to true PNG (the
+  image model can return JPEG bytes); falls back to `ffmpeg` if Pillow is absent
 - Auth (auto-detected):
   - **Vertex AI:** `export GOOGLE_GENAI_USE_VERTEXAI=true GOOGLE_CLOUD_PROJECT=<project> GOOGLE_CLOUD_LOCATION=global` with ADC (`gcloud auth application-default login`)
   - **Gemini API:** `export GEMINI_API_KEY=<key>`

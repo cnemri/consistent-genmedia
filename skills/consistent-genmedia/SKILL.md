@@ -59,6 +59,8 @@ model ids and API details current, since those can change.
 - The two **dependency skills** above (`gemini-api-dev`, `gemini-omni-flash-api`)
   added to the project via `npx skills add`.
 - `pip install -U google-genai` (>= 2.10), and `ffmpeg` + `ffprobe` on PATH.
+- Optional: `pip install pillow` — used to transcode generated images to true PNG.
+  If Pillow is absent the builder falls back to `ffmpeg` for the same conversion.
 - Auth (auto-detected by `scripts/genmedia.py`):
   - **Vertex**: `export GOOGLE_CLOUD_PROJECT=... GOOGLE_CLOUD_LOCATION=global` with
     ADC (`gcloud auth application-default login`). Set `GOOGLE_GENAI_USE_VERTEXAI=true`.
@@ -81,6 +83,12 @@ model ids and API details current, since those can change.
    ```
    Stages are resumable: `refs` → `keyframes` → `clips` → `stitch` (or `all`).
    Inspect `my_story_out/refs/` and `.../keyframes/` before clips if you want.
+   > All generated `.png` files are guaranteed to contain real PNG bytes (the
+   > image model sometimes returns JPEG; the builder transcodes so the extension
+   > never lies). This matters when you open/attach one to another model: a file
+   > whose bytes don't match its declared media type is rejected with a hard 400.
+   > If you ever attach media you did NOT generate here, sniff the bytes for the
+   > mime type instead of trusting the filename extension.
 3. **Review** `my_story_out/final/<title>.mp4`. Per-clip loop transcripts and
    verdicts are saved in `my_story_out/critiques/*.json`.
 

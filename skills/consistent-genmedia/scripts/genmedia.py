@@ -82,6 +82,42 @@ def _image_part_inline(path):
             "mime_type": _sniff_mime(data, path)}
 
 
+def _save_image_png(data, out_path):
+    """Write image bytes to out_path so the file's CONTENT always matches a .png
+    name. The image model may return JPEG; writing those bytes to a .png file
+    makes the extension lie, which breaks any consumer that trusts the extension
+    (image viewers, other tools, and agents that attach the file to an LLM with a
+    mime_type guessed from the name). We transcode non-PNG bytes to real PNG."""
+    os.makedirs(os.path.dirname(out_path) or ".", exist_ok=True)
+    mime = _sniff_mime(data)
+    if mime == "image/png":
+        with open(out_path, "wb") as f:
+            f.write(data)
+        return out_path
+    # Bytes are not PNG (usually JPEG). Transcode so name == content.
+    try:
+        import io
+        from PIL import Image  # preferred: pip install pillow
+        Image.open(io.BytesIO(data)).convert("RGB").save(out_path, format="PNG")
+        return out_path
+    except Exception:  # noqa: BLE001
+        pass
+    # Fallback: ffmpeg (already a hard dependency of this skill).
+    import subprocess
+    import tempfile
+    suffix = ".jpg" if mime == "image/jpeg" else ".bin"
+    with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
+        tmp.write(data)
+        tmp_path = tmp.name
+    try:
+        subprocess.run(
+            ["ffmpeg", "-y", "-loglevel", "error", "-i", tmp_path, out_path],
+            check=True)
+    finally:
+        os.remove(tmp_path)
+    return out_path
+
+
 def _parse_json(text):
     if not text:
         return None
@@ -119,9 +155,7 @@ def generate_image(prompt, out_path, refs=None, aspect_ratio="16:9", retries=3):
             for cand in resp.candidates or []:
                 for part in (cand.content.parts if cand.content else []) or []:
                     if getattr(part, "inline_data", None) and part.inline_data.data:
-                        os.makedirs(os.path.dirname(out_path) or ".", exist_ok=True)
-                        open(out_path, "wb").write(part.inline_data.data)
-                        return out_path
+                        return _save_image_png(part.inline_data.data, out_path)
             last = RuntimeError("no image part in response")
         except Exception as e:  # noqa: BLE001
             last = e
