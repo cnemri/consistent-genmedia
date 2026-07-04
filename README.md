@@ -46,8 +46,9 @@ npx skills add https://github.com/google-gemini/gemini-skills --skill gemini-omn
 Your agent will discover `consistent-genmedia` and follow `SKILL.md`.
 
 ### Manual
-Clone the repo and copy it into your agent skills directory (e.g.
-`.agents/skills/consistent-genmedia/`), or just run the scripts directly.
+Clone the repo and copy `skills/consistent-genmedia/` into your agent skills
+directory (e.g. `.agents/skills/consistent-genmedia/`), or just run the scripts
+directly from `skills/consistent-genmedia/`.
 
 ## Prerequisites
 - `pip install -U google-genai` (>= 2.10)
@@ -58,6 +59,9 @@ Clone the repo and copy it into your agent skills directory (e.g.
 
 ## Quick start
 ```bash
+# the skill (SKILL.md + scripts + references) lives under skills/consistent-genmedia/
+cd skills/consistent-genmedia
+
 # build the bundled example (landscape, 7 shots)
 python scripts/build.py references/example_story.json all --out smoothie_out
 # -> smoothie_out/final/the_legendary_golden_smoothie.mp4
@@ -87,8 +91,9 @@ looks like:
   } ]
 }
 ```
-See [`references/prompting_guide.md`](references/prompting_guide.md) for how to write
-consistent, cinematic prompts, and [`SKILL.md`](SKILL.md) for the full agent workflow.
+See [`references/prompting_guide.md`](skills/consistent-genmedia/references/prompting_guide.md)
+for how to write consistent, cinematic prompts, and
+[`SKILL.md`](skills/consistent-genmedia/SKILL.md) for the full agent workflow.
 
 ## Tuning (env)
 - `REF_CONCURRENCY`, `KEY_CONCURRENCY`, `CLIP_CONCURRENCY` (default 6) — parallelism
@@ -96,13 +101,18 @@ consistent, cinematic prompts, and [`SKILL.md`](SKILL.md) for the full agent wor
 - `IMAGE_MODEL` / `VIDEO_MODEL` / `CRITIC_MODEL` — override model ids
 
 ## Repository layout
+The skill is nested under `skills/consistent-genmedia/` so that `npx skills add`
+installs the **whole folder** (scripts + references), not just `SKILL.md`. The
+`skills` CLI treats a repo-root `SKILL.md` as a single-file entrypoint and copies
+only that file; nesting one level down makes it copy the entire skill directory.
 ```
-SKILL.md                      # agent-facing skill definition & workflow
-scripts/genmedia.py           # core: image/clip gen, music_vote, critique, rewrite, robust loop
-scripts/schema.py             # story-spec helpers (prompts, duration planning, validation)
-scripts/build.py              # CLI: refs -> keyframes -> clips -> stitch (parallel, resumable)
-references/prompting_guide.md # how to write consistent, cinematic prompts
-references/example_story.json # a complete, working example spec
+skills/consistent-genmedia/
+├── SKILL.md                      # agent-facing skill definition & workflow
+├── scripts/genmedia.py           # core: image/clip gen, music_vote, critique, rewrite, robust loop
+├── scripts/schema.py             # story-spec helpers (prompts, duration planning, validation)
+├── scripts/build.py              # CLI: refs -> keyframes -> clips -> stitch (parallel, resumable)
+├── references/prompting_guide.md # how to write consistent, cinematic prompts
+└── references/example_story.json # a complete, working example spec
 ```
 
 ## License
