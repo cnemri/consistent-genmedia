@@ -154,8 +154,9 @@ def generate_image(prompt, out_path, refs=None, aspect_ratio="16:9", retries=3):
                 contents=[types.Content(role="user", parts=parts)], config=cfg)
             for cand in resp.candidates or []:
                 for part in (cand.content.parts if cand.content else []) or []:
-                    if getattr(part, "inline_data", None) and part.inline_data.data:
-                        return _save_image_png(part.inline_data.data, out_path)
+                    inline = getattr(part, "inline_data", None)
+                    if inline is not None and inline.data:
+                        return _save_image_png(inline.data, out_path)
             last = RuntimeError("no image part in response")
         except Exception as e:  # noqa: BLE001
             last = e
@@ -189,8 +190,11 @@ def generate_clip(prompt, out_path, first_frame=None, refs=None,
             data = ov.data
             if isinstance(data, str):
                 data = base64.b64decode(data)
+            if not data:
+                raise SafetyBlocked(f"empty output (possible safety/regional block): {ov}")
             os.makedirs(os.path.dirname(out_path) or ".", exist_ok=True)
-            open(out_path, "wb").write(data)
+            with open(out_path, "wb") as f:
+                f.write(data)
             return {"out": out_path, "id": inter.id, "secs": round(time.time() - t, 1),
                     "bytes": len(data)}
         except SafetyBlocked:
@@ -313,7 +317,7 @@ def critique_video(clip_path, dialogue, characters, allow_music=False, retries=2
                 v["blocking_issues"] = blocking
                 v["approved"] = len(blocking) == 0
                 return v
-            last = RuntimeError(f"unparseable critic output: {resp.text[:160]}")
+            last = RuntimeError(f"unparseable critic output: {(resp.text or '')[:160]}")
         except Exception as e:  # noqa: BLE001
             last = e
         print(f"    [critic retry {attempt}/{retries}] {os.path.basename(clip_path)}: {repr(last)[:140]}")
